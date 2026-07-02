@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ServiceNowRequest(BaseModel):
+class ServiceNowRequestModel(BaseModel):
 
     incident: str
 
