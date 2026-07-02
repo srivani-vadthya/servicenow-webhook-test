@@ -1,8 +1,4 @@
 import logging
-
-from connectors.servicenow_connector import NORMALIZER_URL
-
-
 def get_logger():
 
     logging.basicConfig(
