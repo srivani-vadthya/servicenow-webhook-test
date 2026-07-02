@@ -1,4 +1,6 @@
 import logging
+
+
 def get_logger():
 
     logging.basicConfig(
@@ -12,21 +14,3 @@ def get_logger():
 
 
 logger = get_logger()
-logger.info(
-    "Calling centralized normalizer..."
-)
-
-logger.info(
-    f"URL: {NORMALIZER_URL}"
-)
-
-logger.info(
-    "Normalizer response:"
-)
-
-logger.info(
-    json.dumps(
-        response.json(),
-        indent=4
-    )
-)
