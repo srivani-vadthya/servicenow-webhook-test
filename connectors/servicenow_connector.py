@@ -1,5 +1,7 @@
 import datetime
 import json
+import requests
+import os
 
 from utils.logger_config import (
     logger
@@ -9,64 +11,45 @@ from services.payload_storage_service import (
     payload_storage_service
 )
 
+NORMALIZER_URL = os.getenv(
+    "NORMALIZER_URL"
+)
 
 def process_servicenow(
-        payload: dict):
+        payload):
 
-    logger.info("")
-    logger.info(
-        "=" * 60
-    )
+    # identify source
+    payload[
+        "source"
+    ] = "servicenow"
 
-    logger.info(
-        "SERVICENOW CONNECTOR TRIGGERED"
-    )
-
-    logger.info(
-        "=" * 60
-    )
-
-    logger.info(
-        f"Timestamp: "
-        f"{datetime.datetime.now()}"
-    )
-
-    payload["source"] = (
-        "servicenow"
-    )
-
-    logger.info(
-        "RAW PAYLOAD RECEIVED"
-    )
-
-    logger.info(
-        json.dumps(
-            payload,
-            indent=4
-        )
-    )
-
+    # store raw payload
     payload_storage_service.save_payload(
         payload
     )
 
-    logger.info(
-        f"Payload Count: "
-        f"{payload_storage_service.get_count()}"
-    )
+    # call centralized normalizer
+    try:
 
-    logger.info(
-        "=" * 60
-    )
+        response = requests.post(
+            NORMALIZER_URL,
+            json=payload,
+            timeout=30
+        )
 
-    return {
+        normalized = response.json()
+
+    except Exception as ex:
+
+        logger.error(
+                f"Normalizer error: {ex}"
+        )
+
+        normalized = {
 
         "status":
-            "success",
+            "failed",
 
-        "message":
-            "Payload stored successfully",
-
-        "payload_count":
-            payload_storage_service.get_count()
-    }
+        "error":
+            str(ex)
+        }
